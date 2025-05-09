@@ -1,7 +1,8 @@
-import { Request, RequestHandler, Response } from 'express'
+import { Request, RequestHandler, response, Response } from 'express'
 import AppDataSource from '../connection';
 import { Product } from '../entities/product.entity';
 import { Repository } from 'typeorm';
+import { validate } from 'class-validator';
 
 class ProductController {
   private productRepository: Repository<Product>;
@@ -21,14 +22,29 @@ class ProductController {
   }
 
   async create(req: Request, res: Response): Promise<void> {
-    const { name, description, weight } = req.body;
+    if (typeof req.body == 'undefined') {
+      res.status(400).send({
+        error: 'Empty body'
+      });
+      return;
+    }
 
-    const productRepository = AppDataSource.getRepository(Product);
+    const { name, description, weight } = req.body;
 
     const product = new Product;
     product.name = name;
     product.weight = weight;
     product.description = description;
+
+    const errors = await validate(product);
+    if (errors.length) {
+      res.status(422).send({
+        errors: errors
+      });
+      return;
+    }
+
+    const productRepository = AppDataSource.getRepository(Product);
     const databaseProduct = await productRepository.save(product);
 
     res.status(201).send({
@@ -55,6 +71,13 @@ class ProductController {
   }
 
   async update(req: Request, res: Response): Promise<void> {
+    if (typeof req.body == 'undefined') {
+      res.status(400).send({
+        error: 'Empty body'
+      });
+      return;
+    }
+
     const id: string = req.params['id'];
     const { name, description, weight } = req.body;
 
@@ -71,6 +94,14 @@ class ProductController {
     product.name = name;
     product.description = description;
     product.weight = weight;
+
+    const errors = await validate(product);
+    if (errors.length) {
+      res.status(422).send({
+        errors: errors
+      });
+      return;
+    }
 
     const databaseProduct = await productRepository.save(product);
     res.status(200).send({
