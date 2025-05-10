@@ -1,9 +1,7 @@
 import { Request, Response } from 'express'
-import AppDataSource from '@/database/connection';
-import { Product } from '@/entities/product.entity';
 import { validate } from 'class-validator';
 import { ProductRepository } from '@/repositories/product.repository';
-import { CreateProductDTO } from '@/dto/create.product.dto';
+import { CreateProductDTO, UpdateProductDTO } from '@/dto/product.dto';
 
 class ProductController {
   private productRepository: ProductRepository;
@@ -66,7 +64,7 @@ class ProductController {
     });
   }
 
-  async update(req: Request, res: Response): Promise<void> {
+  update = async (req: Request, res: Response): Promise<void> => {
     if (typeof req.body == 'undefined') {
       res.status(400).send({
         error: 'Empty body'
@@ -77,21 +75,13 @@ class ProductController {
     const id: string = req.params['id'];
     const { name, description, weight } = req.body;
 
-    const productRepository = AppDataSource.getRepository(Product);
-    let product = await productRepository.findOneBy({ id });
+    const updateDTO = new UpdateProductDTO;
+    updateDTO.id = id;
+    updateDTO.name = name;
+    updateDTO.description = description;
+    updateDTO.weight = weight;
 
-    if (!product) {
-      res.status(404).send({
-        error: 'Product not found'
-      });
-      return;
-    }
-
-    product.name = name;
-    product.description = description;
-    product.weight = weight;
-
-    const errors = await validate(product);
+    const errors = await validate(updateDTO);
     if (errors.length) {
       res.status(422).send({
         errors: errors
@@ -99,7 +89,12 @@ class ProductController {
       return;
     }
 
-    const databaseProduct = await productRepository.save(product);
+    const databaseProduct = await this.productRepository.update(updateDTO);
+    if (!databaseProduct) {
+      res.status(404).send({
+        error: 'Product Not Found'
+      });
+    }
     res.status(200).send({
       data: databaseProduct
     })
