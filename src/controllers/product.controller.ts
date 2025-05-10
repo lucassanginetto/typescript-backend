@@ -1,8 +1,9 @@
-import { Request, RequestHandler, response, Response } from 'express'
+import { Request, Response } from 'express'
 import AppDataSource from '@/database/connection';
 import { Product } from '@/entities/product.entity';
 import { validate } from 'class-validator';
 import { ProductRepository } from '@/repositories/product.repository';
+import CreateProductDTO from '@/dto/create.product.dto';
 
 class ProductController {
   private productRepository: ProductRepository;
@@ -11,7 +12,7 @@ class ProductController {
     this.productRepository = new ProductRepository;
   }
 
-  findAll = async (req: Request, res: Response): Promise<void> => {
+  findAll = async (_: Request, res: Response): Promise<void> => {
     const products = await this.productRepository.getAll();
 
     res.status(200).send({
@@ -19,7 +20,7 @@ class ProductController {
     });
   }
 
-  async create(req: Request, res: Response): Promise<void> {
+  create = async (req: Request, res: Response): Promise<void> => {
     if (typeof req.body == 'undefined') {
       res.status(400).send({
         error: 'Empty body'
@@ -29,21 +30,12 @@ class ProductController {
 
     const { name, description, weight } = req.body;
 
-    const product = new Product;
-    product.name = name;
-    product.weight = weight;
-    product.description = description;
+    const dto = new CreateProductDTO;
+    dto.name = name;
+    dto.description = description;
+    dto.weight = weight;
 
-    const errors = await validate(product);
-    if (errors.length) {
-      res.status(422).send({
-        errors: errors
-      });
-      return;
-    }
-
-    const productRepository = AppDataSource.getRepository(Product);
-    const databaseProduct = await productRepository.save(product);
+    const databaseProduct = await this.productRepository.create(dto);
 
     res.status(201).send({
       data: databaseProduct
