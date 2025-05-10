@@ -105,12 +105,10 @@ class ProductController {
     })
   }
 
-  async delete(req: Request, res: Response): Promise<void> {
+  delete = async (req: Request, res: Response): Promise<void> => {
     const id: string = req.params['id'];
 
-    const productRepository = AppDataSource.getRepository(Product);
-    await productRepository.delete(id);
-
+    await this.productRepository.delete(id);
     res.status(204).send({});
   }
 }

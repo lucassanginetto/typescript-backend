@@ -26,4 +26,8 @@ export class ProductRepository {
   async find(id: string): Promise<Product | null> {
     return this.repo.findOneBy({ id });
   }
+
+  async delete(id: string): Promise<void> {
+    this.repo.delete(id);
+  }
 }
