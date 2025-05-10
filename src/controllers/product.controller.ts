@@ -49,11 +49,10 @@ class ProductController {
     });
   }
 
-  async findOne(req: Request, res: Response): Promise<void> {
+  findOne = async (req: Request, res: Response): Promise<void> => {
     const id: string = req.params['id'];
 
-    const productRepository = AppDataSource.getRepository(Product);
-    const product = await productRepository.findOneBy({ id });
+    const product = await this.productRepository.find(id);
 
     if (!product) {
       res.status(404).send({
