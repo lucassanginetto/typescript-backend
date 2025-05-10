@@ -3,7 +3,7 @@ import AppDataSource from '@/database/connection';
 import { Product } from '@/entities/product.entity';
 import { validate } from 'class-validator';
 import { ProductRepository } from '@/repositories/product.repository';
-import CreateProductDTO from '@/dto/create.product.dto';
+import { CreateProductDTO } from '@/dto/create.product.dto';
 
 class ProductController {
   private productRepository: ProductRepository;
@@ -30,12 +30,19 @@ class ProductController {
 
     const { name, description, weight } = req.body;
 
-    const dto = new CreateProductDTO;
-    dto.name = name;
-    dto.description = description;
-    dto.weight = weight;
+    const createProductDTO = new CreateProductDTO;
+    createProductDTO.name = name;
+    createProductDTO.description = description;
+    createProductDTO.weight = weight;
 
-    const databaseProduct = await this.productRepository.create(dto);
+    const errors = await validate(createProductDTO);
+    if (errors.length) {
+      res.status(422).send({
+        errors: errors
+      });
+    }
+
+    const databaseProduct = await this.productRepository.create(createProductDTO);
 
     res.status(201).send({
       data: databaseProduct
