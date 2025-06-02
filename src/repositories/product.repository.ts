@@ -1,17 +1,17 @@
-import AppDataSource from "@/database/connection";
+import getDataSource from "@/database/connection";
 import { CreateProductDTO, UpdateProductDTO } from "@/dto/product.dto";
 import { Product } from "@/entities/product.entity";
 import { Repository } from "typeorm";
 
 export class ProductRepository {
-  private repo: Repository<Product>;
-
-  constructor() {
-    this.repo = AppDataSource.getRepository(Product);
+  async getRepo(): Promise<Repository<Product>> {
+    const dataSource = await getDataSource();
+    return dataSource.getRepository(Product);
   }
 
   async getAll(): Promise<Product[]> {
-    return await this.repo.find();
+    const repo = await this.getRepo();
+    return await repo.find();
   }
 
   async create(input: CreateProductDTO): Promise<Product> {
@@ -20,15 +20,18 @@ export class ProductRepository {
     product.description = input.description;
     product.weight = input.weight;
 
-    return await this.repo.save(product);
+    const repo = await this.getRepo();
+    return await repo.save(product);
   }
 
   async find(id: string): Promise<Product | null> {
-    return this.repo.findOneBy({ id });
+    const repo = await this.getRepo();
+    return repo.findOneBy({ id });
   }
 
   async delete(id: string): Promise<void> {
-    this.repo.delete(id);
+    const repo = await this.getRepo();
+    await repo.delete(id);
   }
 
   async update(input: UpdateProductDTO): Promise<Product | null> {
@@ -41,6 +44,7 @@ export class ProductRepository {
     product.description = input.description;
     product.weight = input.weight;
 
-    return await this.repo.save(product);
+    const repo = await this.getRepo();
+    return await repo.save(product);
   }
 }

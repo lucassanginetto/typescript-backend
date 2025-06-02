@@ -6,7 +6,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import '@/database/connection';
 import routes from '@/routes';
 
 const PORT = process.env.PORT || 8080;
@@ -19,3 +18,5 @@ app.use(routes);
 app.listen(PORT, () => {
   console.log(`server running in port ${PORT}`);
 });
+
+module.exports = app;

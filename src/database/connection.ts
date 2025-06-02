@@ -20,8 +20,11 @@ const AppDataSource = new DataSource({
   } : undefined
 });
 
-AppDataSource.initialize()
-  .then(() => console.log('Connected successfully'))
-  .catch((error) => console.log(error))
+const getDataSource = async (): Promise<DataSource> => {
+  if (!AppDataSource.isInitialized) {
+    await AppDataSource.initialize();
+  }
+  return AppDataSource;
+};
 
-export default AppDataSource;
+export default getDataSource;
