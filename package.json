@@ -27,8 +27,7 @@
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "dev": "ts-node-dev --transpile-only src/index.ts",
-    "typeorm": "./node_modules/.bin/typeorm"
+    "dev": "ts-node-dev --transpile-only src/index.ts"
   },
   "_moduleAliases": {
     "@": "src"
