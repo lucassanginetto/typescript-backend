@@ -1,4 +1,3 @@
-import 'module-alias/register';
 import bodyParser from 'body-parser';
 import express from 'express';
 import cors from 'cors';
@@ -6,7 +5,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import routes from '@/routes';
+import routes from './routes';
 
 const PORT = process.env.PORT || 8080;
 

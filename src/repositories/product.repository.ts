@@ -1,6 +1,6 @@
-import getDataSource from "@/database/connection";
-import { CreateProductDTO, UpdateProductDTO } from "@/dto/product.dto";
-import { Product } from "@/entities/product.entity";
+import getDataSource from "../database/connection";
+import { CreateProductDTO, UpdateProductDTO } from "../dto/product.dto";
+import { Product } from "../entities/product.entity";
 import { Repository } from "typeorm";
 
 export class ProductRepository {
